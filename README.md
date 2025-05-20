@@ -1,0 +1,1 @@
+This is just for deployment. It is part (the client code) of e-commerce repo
