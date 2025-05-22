@@ -1,0 +1,28 @@
+name: Deploy Node.js App to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  # Or whichever branch you want
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd e-commerce-backend-code || git clone https://github.com/Katotodan/e-commerce-backend-code.git && cd e-commerce-backend-code
+            git pull
+            npm install
+            pm2 restart all || pm2 start app.js --name e-commerce-backend-code
+          EOF
