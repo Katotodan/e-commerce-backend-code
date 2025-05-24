@@ -1,9 +1,9 @@
-name: Deploy Node.js App to AWS EC2
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - main  # Or whichever branch you want
+      - main
 
 jobs:
   deploy:
@@ -13,16 +13,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH key
-        run: |
-          echo "${{ secrets.EC2_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "/home/ubuntu/app"
 
-      - name: Deploy to EC2
-        run: |
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd e-commerce-backend-code || git clone https://github.com/Katotodan/e-commerce-backend-code.git && cd e-commerce-backend-code
-            git pull
+      - name: SSH into EC2 and restart app
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+            echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> .env
+            echo "PORT=${{ secrets.PORT }}" >> .env
             npm install
-            pm2 restart all || pm2 start app.js --name e-commerce-backend-code
-          EOF
+            pm2 stop all || true
+            pm2 start server.js --name "node-app"
