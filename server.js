@@ -10,17 +10,18 @@ const PORT = process.env.PORT || 3000
 
 
 // Middleware
-app.use(cors({
-    origin:process.env.FRONTEND_URL,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: [
-        'Content-Type', 
-        'Authorization', 
-        'Access-Control-Allow-Credentials', 
-        'Access-Control-Allow-Origin',
-    ],
-    credentials: true
-}))
+// app.use(cors({
+//     origin:process.env.FRONTEND_URL,
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     allowedHeaders: [
+//         'Content-Type', 
+//         'Authorization', 
+//         'Access-Control-Allow-Credentials', 
+//         'Access-Control-Allow-Origin',
+//     ],
+//     credentials: true
+// }))
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use("", routes)
