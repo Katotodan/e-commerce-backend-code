@@ -26,7 +26,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use("", routes)
 app.get("/test", (req, res)=>{
-    res.send("<h2>Trying succeded</h2>")
+    res.send(`<h2>Trying succeded</h2> ${process.env.FRONTEND_URL}`)
 })
 const startApp = async() =>{
     try {
