@@ -11,6 +11,20 @@ const { login, logOut, signUp, getUser } = require( '../Controller/auth')
 
 const router = express.Router()
 
+router.route("/wake-up").get((req, res) =>{
+    try {
+        res.status(200).json({message: "Backend server is awake" })
+    } catch (error) {
+        res.status(500).json({
+            status: "fail",
+            message: error.message
+        })
+        
+    }
+    
+})
+
+// Products
 router.route("/getallproducts").get(getAllProducts)
 router.route("/getproduct").get(getProduct)
 router.route("/addproduct").post(addProduct)
